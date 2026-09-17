@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام رفع الملاحظات والتقارير</title>
+    <title>نظام رفع التقارير</title>
     <style>
         * {
             box-sizing: border-box;
@@ -114,7 +114,7 @@
 <body>
 
 <div class="card">
-    <h1>نظام رفع الملاحظات</h1>
+    <h1>نظام رفع التقارير</h1>
     
     <form id="reportForm">
         <!-- التصنيف الرئيسي -->
@@ -323,7 +323,7 @@
             statusMsg.innerText = '❌ لم يتم وضع رابط Webhook لهذا القسم بعد.';
             statusMsg.className = 'status error';
             submitBtn.disabled = false;
-            submitBtn.innerText = 'رفع الملاحظة';
+            submitBtn.innerText = 'رفع التقرير';
             return;
         }
 
@@ -350,7 +350,7 @@
             statusMsg.className = 'status error';
         } finally {
             submitBtn.disabled = false;
-            submitBtn.innerText = 'رفع الملاحظة';
+            submitBtn.innerText = 'رفع التقرير';
         }
     });
 </script>
