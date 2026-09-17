@@ -289,9 +289,9 @@
             const type = violationType.value;
             webhookUrl = WEBHOOKS.violations[type];
 
-            messageText = `📝 **ملاحظة جديدة تم رفعها!**\n +
-                ايدي المسؤول: <@${reporterId}>\n +
-                 ايدي العسكري: <@${targetId}>**`;
+            messageText = `📝 **ملاحظة جديدة تم رفعها!**\n` +
+                `ايدي المسؤول: ${reporterId}\n` +
+                `ايدي العسكري: ${targetId}`;
 
             if (type === 'تقارير-مخالفات-يدوية' || details) {
                 messageText += `\n📄 **تفاصيل الملاحظة:**\n${details}`;
@@ -301,9 +301,9 @@
             const type = disciplineType.value;
             webhookUrl = WEBHOOKS.discipline[type];
 
-            messageText = `🌟 **تقرير انضباط جديد تم رفعه!\n +
-                ايدي المسؤول: <@${reporterId}>\n +
-                 ايدي العسكري: <@${targetId}>**`;
+            messageText = `🌟 **تقرير انضباط جديد تم رفعه!**\n` +
+                `ايدي المسؤول: ${reporterId}\n` +
+                `ايدي العسكري: ${targetId}`;
 
             if (type === 'تقارير-انضباط-يدوية' || details) {
                 messageText += `\n📄 **تفاصيل الملاحظة:**\n${details}`;
@@ -312,11 +312,11 @@
         } else if (cat === 'accountability') {
             webhookUrl = WEBHOOKS.accountability;
 
-            messageText = `⚖️ **طلب محاسبة جديد!\n +
-                ايدي المسؤول: <@${reporterId}>\n +
-                ايدي المخالف: <@${targetId}>\n +
-                تفاصيل المخالفة:\n${details}\n +
-                المحاسبة المستحقة: ${penalty}**`;
+            messageText = `⚖️ **طلب محاسبة جديد!**\n` +
+                `ايدي المسؤول: ${reporterId}\n` +
+                `ايدي المخالف: ${targetId}\n` +
+                `تفاصيل المخالفة:\n${details}\n` +
+                `المحاسبة المستحقة: ${penalty}`;
         }
 
         if (!webhookUrl) {
