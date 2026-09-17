@@ -3,177 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>رفع التقارير العسكرية</title>
+    <title>نظام رفع الملاحظات والتقارير</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
         body {
-            background-color: #1a1a1a;
+            background-color: #121212;
             color: #ffffff;
-            font-family: Tahoma, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
-            padding: 20px 0;
+            padding: 20px;
         }
-        .container {
-            background-color: #2b2b2b;
+
+        .card {
+            background-color: #1e1e1e;
+            border-radius: 12px;
             padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            width: 400px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
         }
-        h2 {
+
+        h1 {
+            color: #6366f1;
             text-align: center;
             margin-bottom: 20px;
-            color: #5865F2;
+            font-size: 24px;
         }
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
+
         label {
             display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #dddddd;
         }
-        input[type="text"], select, textarea, input[type="file"] {
+
+        input[type="text"],
+        select,
+        textarea,
+        input[type="file"] {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #444;
-            border-radius: 5px;
-            background-color: #1e1e1e;
-            color: #fff;
-            box-sizing: border-box;
+            padding: 10px 12px;
+            background-color: #121212;
+            border: 1px solid #333333;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
         }
+
+        input[type="text"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #6366f1;
+        }
+
         textarea {
             resize: vertical;
-            height: 100px;
+            min-height: 80px;
         }
+
         button {
             width: 100%;
             padding: 12px;
-            background-color: #5865F2;
-            border: none;
-            border-radius: 5px;
+            background-color: #6366f1;
             color: white;
-            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: background-color 0.2s;
+            margin-top: 10px;
         }
+
         button:hover {
-            background-color: #4752C4;
+            background-color: #4f46e5;
         }
+
+        button:disabled {
+            background-color: #4b5563;
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .status {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .success { color: #22c55e; }
+        .error { color: #ef4444; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>نظام رفع التقارير</h2>
-        <form id="reportForm">
-            <div class="form-group">
-                <label for="reportType">نوع التقرير:</label>
-                <select id="reportType" required>
-                    <option value="offender">🚨 تقرير مخالفين</option>
-                    <option value="disciplined">🟢 تقرير منضبطين</option>
-                </select>
-            </div>
+<div class="card">
+    <h1>نظام رفع الملاحظات</h1>
+    
+    <form id="reportForm">
+        <!-- التصنيف الرئيسي -->
+        <div class="form-group">
+            <label>التصنيف الرئيسي:</label>
+            <select id="mainCategory" required>
+                <option value="violations">تقارير المخالفات</option>
+                <option value="discipline">تقارير الانضباط اليومي</option>
+                <option value="accountability">طلبات المحاسبة</option>
+            </select>
+        </div>
 
-            <div class="form-group">
-                <label for="adminId">كوبي يوزر المسؤول:</label>
-                <input type="text" id="adminId" required placeholder="مثال: 12312313324">
-            </div>
+        <!-- قائمة تقارير المخالفات -->
+        <div class="form-group" id="violationTypeGroup">
+            <label>نوع التقرير:</label>
+            <select id="violationType">
+                <option value="تقارير-القيافه-العسكريه">تقارير القيافه العسكريه</option>
+                <option value="تقارير-المركبات-العسكريه-المحدده">تقارير المركبات العسكريه المحدده</option>
+                <option value="تقارير-الالتزام-بالراديو-والتردد">تقارير الالتزام بالراديو والتردد</option>
+                <option value="تقارير-الالتزام-ببروتوكولات-الراديو">تقارير الالتزام ببروتوكولات الراديو</option>
+                <option value="تقارير-الالتزام-بالصف-العسكري">تقارير الالتزام بالصف العسكري</option>
+                <option value="تقارير-احترام-البدله-العسكريه">تقارير احترام البدله العسكريه</option>
+                <option value="تقارير-احترام-الرتبه">تقارير احترام الرتبه</option>
+                <option value="تقارير-الالتزام-بالامر-العسكري">تقارير الالتزام بالامر العسكري</option>
+                <option value="تقارير-اكثر-عسكري-استلاما-لمسؤوليات-الميدان">تقارير اكثر عسكري استلاما لمسؤوليات الميدان</option>
+                <option value="تقارير-مخالفات-يدوية">تقارير مخالفات يدوية</option>
+            </select>
+        </div>
 
-            <div class="form-group">
-                <label for="targetId">كوبي يوزر العسكري:</label>
-                <input type="text" id="targetId" required placeholder="مثال: 12312313324">
-            </div>
+        <!-- قائمة تقارير الانضباط -->
+        <div class="form-group hidden" id="disciplineTypeGroup">
+            <label>نوع التقرير:</label>
+            <select id="disciplineType">
+                <option value="تقارير-افضل-عسكري-ملتزم-بالبروتوكولات-بالراديو">تقارير افضل عسكري ملتزم بالبروتوكولات بالراديو</option>
+                <option value="تقارير-افضل-عسكري-ملتزم-بالامر-العسكري">تقارير افضل عسكري ملتزم بالامر العسكري</option>
+                <option value="تقارير-افضل-عسكري-استلاما-لمسؤوليات-الميدان">تقارير افضل عسكري استلاما لمسؤوليات الميدان</option>
+                <option value="تقارير-افضل-عسكري-ملتزم-بالصف">تقارير افضل عسكري ملتزم بالصف</option>
+                <option value="تقارير-افضل-عسكري-قيادي-بالميدان">تقارير افضل عسكري قيادي بالميدان</option>
+                <option value="تقارير-انضباط-يدوية">تقارير انضباط يدوية</option>
+            </select>
+        </div>
 
-            <div class="form-group">
-                <label for="reportDetails">تفاصيل التقرير:</label>
-                <textarea id="reportDetails" required placeholder="اكتب تفاصيل التقرير هنا..."></textarea>
-            </div>
+        <!-- الحقول الأساسية -->
+        <div class="form-group">
+            <label>ايدي المسؤول:</label>
+            <input type="text" id="reporterId" placeholder="مثال: 773" required>
+        </div>
 
-            <div class="form-group">
-                <label for="reportFile">رفع صورة (اختياري):</label>
-                <input type="file" id="reportFile" accept="image/*">
-            </div>
+        <div class="form-group" id="targetUserGroup">
+            <label id="targetUserLabel">ايدي العسكري:</label>
+            <input type="text" id="targetId" placeholder="مثال: 773" required>
+        </div>
 
-            <div class="form-group">
-                <label for="videoUrl">رابط الفيديو (اختياري):</label>
-                <input type="text" id="videoUrl" placeholder="ضع رابط الفيديو هنا (YouTube, Streamable...)">
-            </div>
+        <!-- حقل المحاسبة المستحقة -->
+        <div class="form-group hidden" id="accountabilityGroup">
+            <label>المحاسبة المستحقة:</label>
+            <input type="text" id="penalty" placeholder="اكتب المحاسبة المستحقة هنا...">
+        </div>
 
-            <button type="submit" id="submitBtn">رفع التقرير</button>
-        </form>
-    </div>
+        <!-- حقل التفاصيل -->
+        <div class="form-group" id="detailsGroup">
+            <label id="detailsLabel">تفاصيل الملاحظة:</label>
+            <textarea id="details" placeholder="اكتب التفاصيل هنا..."></textarea>
+        </div>
 
-    <script>
-        // ضع روابط الـ Webhook لكل نوع تقرير هنا
-        const WEBHOOK_OFFENDERS = "https://discord.com/api/webhooks/1549856687345893397/q9TofSMJx7q2rvGpqc7V6RPVaozSlGcsg01_WsSbUux8nrYqNZt3rP0rB3pUK3lY1rHD";
-        const WEBHOOK_DISCIPLINED = "https://discord.com/api/webhooks/1549859412217438299/uafVSsGuzVaHfnMNgOg7l3tD2rvuRl933e_tECKbHNyYxEWUMQIgalxv9vP5cbB5zlm8";
+        <div class="form-group">
+            <label>رفع صورة (إن وجد):</label>
+            <input type="file" id="imageFile" accept="image/*">
+        </div>
 
-        document.getElementById('reportForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const reportType = document.getElementById('reportType').value;
-            const adminId = document.getElementById('adminId').value;
-            const targetId = document.getElementById('targetId').value;
-            const details = document.getElementById('reportDetails').value;
-            const fileInput = document.getElementById('reportFile').files[0];
-            const videoUrl = document.getElementById('videoUrl').value;
-            const submitBtn = document.getElementById('submitBtn');
+        <div class="form-group">
+            <label>رابط الفيديو (إن وجد):</label>
+            <input type="text" id="videoUrl" placeholder="ضع رابط الفيديو هنا (YouTube, Streamable...)">
+        </div>
 
-            submitBtn.disabled = true;
-            submitBtn.textContent = "جاري الإرسال...";
+        <button type="submit" id="submitBtn">رفع الملاحظة</button>
+        <div id="statusMessage" class="status"></div>
+    </form>
+</div>
 
-            let targetWebhook = "";
-            let messageContent = "";
+<script>
+    // روابط Webhook مجهزة بترتيب القنوات من الصور
+    const WEBHOOKS = {
+        violations: {
+            "تقارير-القيافه-العسكريه": "https://discord.com/api/webhooks/1549856687345893397/q9TofSMJx7q2rvGpqc7V6RPVaozSlGcsg01_WsSbUux8nrYqNZt3rP0rB3pUK3lY1rHD",
+            "تقارير-المركبات-العسكريه-المحدده": "https://discord.com/api/webhooks/1549859412217438299/uafVSsGuzVaHfnMNgOg7l3tD2rvuRl933e_tECKbHNyYxEWUMQIgalxv9vP5cbB5zlm8",
+            "تقارير-الالتزام-بالراديو-والتردد": "https://discord.com/api/webhooks/1550234712730247178/Mi66BMCwCJJNzsD689MnPo3vzyiaVKTzHc8Zq7tPkGHeQXa9GMYC6dQNtVjlxAlfaRON",
+            "تقارير-الالتزام-ببروتوكولات-الراديو": "https://discord.com/api/webhooks/1550235021476892813/y7CcTGo4kdowsNQ2b_UfAN1d550ni8zcm-hMlOfcljA9c-csTms19N2jpUocXAiYrZwB",
+            "تقارير-الالتزام-بالصف-العسكري": "https://discord.com/api/webhooks/1550235952872558612/eI-A1nLVkOm1pJSs0MqdE4IkT4pxIvZTCwhQSyydOA4Qg_zomg7jt9t-NqkwqVfghQhh",
+            "تقارير-احترام-البدله-العسكريه": "https://discord.com/api/webhooks/1550236046313132142/4vkb-m_hLwTvYjIjRkg7FYQliBC43gFsuruI96k7y7kFJi03x4_N1MjV5i3Dvjig6nh7",
+            "تقارير-احترام-الرتبه": "https://discord.com/api/webhooks/1550236149371379753/X3IuEol1r8S406xCItxxuFakpIIPQkxdioSkPlfMiwOytOuJ9SvjYOUXs03etXSZ5ErG",
+            "تقارير-الالتزام-بالامر-العسكري": "https://discord.com/api/webhooks/1550236203213914152/Eaj-nfwkrxEdgyJVlS3STaotenRY6-gys8ojtQotqPsy7qVIXsmMRw7u5Bjc3pHo4wHF",
+            "تقارير-اكثر-عسكري-استلاما-لمسؤوليات-الميدان": "https://discord.com/api/webhooks/1550236258763022448/FA7CfA3lbhxSk1onOaGkTmc2OcNZ0NOS4BhFe6-ShXZG8qTJtvaV3F0aTmPnEZKWWPZX",
+            "تقارير-مخالفات-يدوية": "https://discord.com/api/webhooks/1550236320675139626/5gaiKC2__U_hAvOrYQ3vZ1O8bcy2ppZqmUUgHq53JjJ9mW0YonRKrQpkSnRI4J7ZUVcu"
+        },
+        discipline: {
+            "تقارير-افضل-عسكري-ملتزم-بالبروتوكولات-بالراديو": "https://discord.com/api/webhooks/1550236383166206132/dCYmXQZ29q2YyFY1HgehetCuok8jG3l2skqQHZtG0fLRL5auoKLab9Y0Q2Nq-HQ6oPhW",
+            "تقارير-افضل-عسكري-ملتزم-بالامر-العسكري": "https://discord.com/api/webhooks/1550236527362187315/n_-VorHPrdtIbJEbLAAIqPJuf73fHzcUZCq8tU2kFFQNpWjQcOgdOGpQSDBK2PHHckrD",
+            "تقارير-افضل-عسكري-استلاما-لمسؤوليات-الميدان": "https://discord.com/api/webhooks/1550236606445649990/_dZ6gb-Ce3Qku9p8uw9Kr3XyoZZeAoj4NwHsh2w7QzW9hjTDRWlexZJOFrlgaTdQMCw0",
+            "تقارير-افضل-عسكري-ملتزم-بالصف": "https://discord.com/api/webhooks/1550236671881121812/eXJHw0J5wcNm9sNb12ACVNfx_ZcWkhlxdr7Aa9dbcyOmWLSqpbMKEKg5m-3pFgi1WLZN",
+            "تقارير-افضل-عسكري-قيادي-بالميدان": "https://discord.com/api/webhooks/1550236721331970078/7kVGSsXoCgH-ib4xzcNB8LFRgiTT2iIUkH8USHs5hrOZTJMdHjhm-8Kb_yD_G0zTtx7b",
+            "تقارير-انضباط-يدوية": "https://discord.com/api/webhooks/1550236761257414697/TruEP3xBRk8zkfYJzBm4JRveFoMIPGXTHmT4Dad6pPlazptpGYQVD2H444-UQ-xr30sn"
+        },
+        accountability: ""
+    };
 
-            if (reportType === 'offender') {
-                targetWebhook = WEBHOOK_OFFENDERS;
-                messageContent = `📝 **ملاحظة جديدة تم رفعها!**\nكوبي يوزر المسؤول: <@${adminId}>\n🎖️ كوبي يوزر العسكري: <@${targetId}>\n📄 **تفاصيل الملاحظة:**\n${details}`;
+    const mainCategory = document.getElementById('mainCategory');
+    const violationTypeGroup = document.getElementById('violationTypeGroup');
+    const disciplineTypeGroup = document.getElementById('disciplineTypeGroup');
+    const accountabilityGroup = document.getElementById('accountabilityGroup');
+    const detailsGroup = document.getElementById('detailsGroup');
+    const violationType = document.getElementById('violationType');
+    const disciplineType = document.getElementById('disciplineType');
+    const targetUserLabel = document.getElementById('targetUserLabel');
+
+    function updateFormVisibility() {
+        const cat = mainCategory.value;
+
+        violationTypeGroup.classList.add('hidden');
+        disciplineTypeGroup.classList.add('hidden');
+        accountabilityGroup.classList.add('hidden');
+
+        if (cat === 'violations') {
+            violationTypeGroup.classList.remove('hidden');
+            targetUserLabel.innerText = 'ايدي العسكري:';
+            checkManualField(violationType.value);
+        } else if (cat === 'discipline') {
+            disciplineTypeGroup.classList.remove('hidden');
+            targetUserLabel.innerText = 'ايدي العسكري:';
+            checkManualField(disciplineType.value);
+        } else if (cat === 'accountability') {
+            accountabilityGroup.classList.remove('hidden');
+            detailsGroup.classList.remove('hidden');
+            targetUserLabel.innerText = 'ايدي المخالف:';
+        }
+    }
+
+    function checkManualField(value) {
+        if (value === 'تقارير-مخالفات-يدوية' || value === 'تقارير-انضباط-يدوية') {
+            detailsGroup.classList.remove('hidden');
+        } else {
+            detailsGroup.classList.add('hidden');
+        }
+    }
+
+    mainCategory.addEventListener('change', updateFormVisibility);
+    violationType.addEventListener('change', (e) => checkManualField(e.target.value));
+    disciplineType.addEventListener('change', (e) => checkManualField(e.target.value));
+
+    updateFormVisibility();
+
+    document.getElementById('reportForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMsg = document.getElementById('statusMessage');
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'جاري الرفع...';
+
+        const cat = mainCategory.value;
+        const reporterId = document.getElementById('reporterId').value.trim();
+        const targetId = document.getElementById('targetId').value.trim();
+        const details = document.getElementById('details').value.trim();
+        const penalty = document.getElementById('penalty').value.trim();
+        const videoUrl = document.getElementById('videoUrl').value.trim();
+        const fileInput = document.getElementById('imageFile').files[0];
+
+        let webhookUrl = '';
+        let messageText = '';
+
+        if (cat === 'violations') {
+            const type = violationType.value;
+            webhookUrl = WEBHOOKS.violations[type];
+
+            messageText = `📝 **ملاحظة جديدة تم رفعها!**\n` +
+                `ايدي المسؤول: <@${reporterId}>\n` +
+                `🎖️ ايدي العسكري: <@${targetId}>`;
+
+            if (type === 'تقارير-مخالفات-يدوية' || details) {
+                messageText += `\n📄 **تفاصيل الملاحظة:**\n${details}`;
+            }
+
+        } else if (cat === 'discipline') {
+            const type = disciplineType.value;
+            webhookUrl = WEBHOOKS.discipline[type];
+
+            messageText = `🌟 **تقرير انضباط جديد تم رفعه!**\n` +
+                `ايدي المسؤول: <@${reporterId}>\n` +
+                `🎖️ ايدي العسكري: <@${targetId}>`;
+
+            if (type === 'تقارير-انضباط-يدوية' || details) {
+                messageText += `\n📄 **تفاصيل الملاحظة:**\n${details}`;
+            }
+
+        } else if (cat === 'accountability') {
+            webhookUrl = WEBHOOKS.accountability;
+
+            messageText = `⚖️ **طلب محاسبة جديد!**\n` +
+                `👤 ايدي المسؤول: <@${reporterId}>\n` +
+                `🚫 ايدي المخالف: <@${targetId}>\n` +
+                `📄 **تفاصيل المخالفة:**\n${details}\n` +
+                `📌 **المحاسبة المستحقة:** ${penalty}`;
+        }
+
+        if (!webhookUrl) {
+            statusMsg.innerText = '❌ لم يتم وضع رابط Webhook لهذا القسم بعد.';
+            statusMsg.className = 'status error';
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'رفع الملاحظة';
+            return;
+        }
+
+        if (videoUrl) {
+            messageText += `\n🎥 **رابط الفيديو:** ${videoUrl}`;
+        }
+
+        const formData = new FormData();
+        formData.append('payload_json', JSON.stringify({ content: messageText }));
+        if (fileInput) formData.append('file', fileInput);
+
+        try {
+            const response = await fetch(webhookUrl, { method: 'POST', body: formData });
+            if (response.ok) {
+                statusMsg.innerText = '✅ تم رفع التقرير بنجاح!';
+                statusMsg.className = 'status success';
+                document.getElementById('reportForm').reset();
+                updateFormVisibility();
             } else {
-                targetWebhook = WEBHOOK_DISCIPLINED;
-                messageContent = `🌟 **تقرير انضباط جديد تم رفعه!**\nكوبي يوزر المسؤول: <@${adminId}>\n🎖️ كوبي يوزر العسكري: <@${targetId}>\n📄 **تفاصيل الملاحظة:**\n${details}`;
+                throw new Error('حدث خطأ أثناء الإرسال، تأكد من صحة الـ Webhook.');
             }
-            
-            if (videoUrl) {
-                messageContent += `\n🎥 **رابط الفيديو:** ${videoUrl}`;
-            }
-
-            const formData = new FormData();
-            const payload = {
-                content: messageContent
-            };
-
-            formData.append('payload_json', JSON.stringify(payload));
-
-            if (fileInput) {
-                formData.append('file', fileInput);
-            }
-
-            try {
-                const response = await fetch(targetWebhook, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (response.ok) {
-                    alert('تم رفع التقرير وإرساله بنجاح!');
-                    document.getElementById('reportForm').reset();
-                } else {
-                    alert('حدث خطأ أثناء إرسال التقرير، تأكد من صحة رابط الـ Webhook.');
-                }
-            } catch (error) {
-                console.error(error);
-                alert('فشل الاتصال بالخدمة.');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = "رفع التقرير";
-            }
-        });
-    </script>
+        } catch (err) {
+            statusMsg.innerText = `❌ ${err.message}`;
+            statusMsg.className = 'status error';
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'رفع الملاحظة';
+        }
+    });
+</script>
 
 </body>
 </html>
