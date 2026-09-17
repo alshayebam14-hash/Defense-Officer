@@ -190,7 +190,7 @@
             <input type="text" id="videoUrl" placeholder="ضع رابط الفيديو هنا (YouTube, Streamable...)">
         </div>
 
-        <button type="submit" id="submitBtn">رفع الملاحظة</button>
+        <button type="submit" id="submitBtn">رفع التقرير</button>
         <div id="statusMessage" class="status"></div>
     </form>
 </div>
@@ -289,12 +289,12 @@
             const type = violationType.value;
             webhookUrl = WEBHOOKS.violations[type];
 
-            messageText = `📝 **ملاحظة جديدة تم رفعها!**\n` +
+            messageText = `📝 **التقرير جديد تم رفعه!**\n` +
                 `ايدي المسؤول: ${reporterId}\n` +
                 `ايدي العسكري: ${targetId}`;
 
             if (type === 'تقارير-مخالفات-يدوية' || details) {
-                messageText += `\n📄 **تفاصيل الملاحظة:**\n${details}`;
+                messageText += `\n📄 **تفاصيل التقرير:**\n${details}`;
             }
 
         } else if (cat === 'discipline') {
@@ -306,7 +306,7 @@
                 `ايدي العسكري: ${targetId}`;
 
             if (type === 'تقارير-انضباط-يدوية' || details) {
-                messageText += `\n📄 **تفاصيل الملاحظة:**\n${details}`;
+                messageText += `\n📄 **تفاصيل التقرير:**\n${details}`;
             }
 
         } else if (cat === 'accountability') {
