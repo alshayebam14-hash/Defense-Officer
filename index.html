@@ -221,7 +221,7 @@
             "تقارير-افضل-عسكري-قيادي-بالميدان": "https://discord.com/api/webhooks/1550236721331970078/7kVGSsXoCgH-ib4xzcNB8LFRgiTT2iIUkH8USHs5hrOZTJMdHjhm-8Kb_yD_G0zTtx7b",
             "تقارير-انضباط-يدوية": "https://discord.com/api/webhooks/1550236761257414697/TruEP3xBRk8zkfYJzBm4JRveFoMIPGXTHmT4Dad6pPlazptpGYQVD2H444-UQ-xr30sn"
         },
-        accountability: ""
+        accountability: "https://discord.com/api/webhooks/1550236815271661568/TtHkqDE2Td_e_GwD-lJlTz5TCFdPAby7okXx-BzZuB2tIk5bqfnH1nYDDlH_LWQmHIsP"
     };
 
     const mainCategory = document.getElementById('mainCategory');
@@ -281,7 +281,7 @@
         const reporterId = document.getElementById('reporterId').value.trim();
         const targetId = document.getElementById('targetId').value.trim();
         const details = document.getElementById('details').value.trim();
-        const penalty = document.getElementById('penalty').value.trim();
+        const penaltyInput = document.getElementById('penalty').value.trim();
         const videoUrl = document.getElementById('videoUrl').value.trim();
         const fileInput = document.getElementById('imageFile').files[0];
 
@@ -321,7 +321,7 @@
                 `ايدي المسؤول: ${reporterId}\n` +
                 `ايدي المخالف: ${targetId}\n` +
                 `تفاصيل المخالفة:\n${details}\n` +
-                `المحاسبة المستحقة: ${penalty}`;
+                `المحاسبة المستحقة: ${penaltyInput}`;
         }
 
         if (!webhookUrl) {
@@ -336,16 +336,15 @@
             messageText += `\n🎥 **رابط الفيديو:** ${videoUrl}`;
         }
 
-        // إعداد البيانات المرسلة لقاعدة البيانات
+        // إعداد البيانات لقاعدة البيانات مرتبة مطابقة لأعمدة الشيت [A, B, C, D, E, F]
         const dbData = {
-            mainCategory: cat,
-            reportType: reportTypeName,
-            reporterId: reporterId,
-            targetId: targetId,
-            details: details,
-            penalty: penalty,
-            videoUrl: videoUrl,
-            timestamp: new Date().toLocaleString('ar-SA')
+            timestamp: new Date().toLocaleDateString('en-CA'),             // A: التاريخ
+            mainCategory: cat,                                            // B: التصنيف الرئيسي
+            reportType: reportTypeName,                                   // C: ايدي المسؤول (أو نوع التقرير بحسب الشيت)
+            reporterId: reporterId,                                       // D: ايدي العسكري
+            targetId: targetId,                                           // E: التفاصيل
+            details: details || "-",                                      // F: المحاسبة المستحقة
+            penalty: (cat === 'accountability') ? penaltyInput : ""       // لا ترسل شيئاً للعمود G
         };
 
         const formData = new FormData();
