@@ -196,10 +196,8 @@
 </div>
 
 <script>
-    // رابط قاعدة البيانات (Google Apps Script)
-    const DATABASE_URL = "https://script.google.com/macros/s/AKfycbxwzA9HT4WNVauFg-jlpEPXrZY1Znbc7EWwtvnBIphmteo1TwDgnYk_1XEuWMQqSKMSFw/exec";
+    const DATABASE_URL = "https://script.google.com/macros/s/AKfycbz5-t_HoTfFLTtocuN7rnYDIRtcJKpqi_clwmxFjIbT2s7PTGWzvY7rice7loIJdZPl-A/exec";
 
-    // روابط Webhook مجهزة بترتيب القنوات من الصور
     const WEBHOOKS = {
         violations: {
             "تقارير-القيافه-العسكريه": "https://discord.com/api/webhooks/1549856687345893397/q9TofSMJx7q2rvGpqc7V6RPVaozSlGcsg01_WsSbUux8nrYqNZt3rP0rB3pUK3lY1rHD",
@@ -288,8 +286,10 @@
         let webhookUrl = '';
         let messageText = '';
         let reportTypeName = '';
+        let categoryArabicName = '';
 
         if (cat === 'violations') {
+            categoryArabicName = 'تقارير المخالفات';
             reportTypeName = violationType.value;
             webhookUrl = WEBHOOKS.violations[reportTypeName];
 
@@ -302,6 +302,7 @@
             }
 
         } else if (cat === 'discipline') {
+            categoryArabicName = 'تقارير الانضباط اليومي';
             reportTypeName = disciplineType.value;
             webhookUrl = WEBHOOKS.discipline[reportTypeName];
 
@@ -314,6 +315,7 @@
             }
 
         } else if (cat === 'accountability') {
+            categoryArabicName = 'طلبات المحاسبة';
             reportTypeName = 'طلب محاسبة';
             webhookUrl = WEBHOOKS.accountability;
 
@@ -336,15 +338,15 @@
             messageText += `\n🎥 **رابط الفيديو:** ${videoUrl}`;
         }
 
-        // إعداد البيانات لقاعدة البيانات مرتبة مطابقة لأعمدة الشيت [A, B, C, D, E, F]
+        // إعداد كائن البيانات بالترتيب المطابق لعمود الشيت
         const dbData = {
-            timestamp: new Date().toLocaleDateString('en-CA'),             // A: التاريخ
-            mainCategory: cat,                                            // B: التصنيف الرئيسي
-            reportType: reportTypeName,                                   // C: ايدي المسؤول (أو نوع التقرير بحسب الشيت)
-            reporterId: reporterId,                                       // D: ايدي العسكري
-            targetId: targetId,                                           // E: التفاصيل
-            details: details || "-",                                      // F: المحاسبة المستحقة
-            penalty: (cat === 'accountability') ? penaltyInput : ""       // لا ترسل شيئاً للعمود G
+            timestamp: new Date().toLocaleDateString('en-CA'),              // A: التاريخ
+            mainCategory: categoryArabicName,                               // B: التصنيف الرئيسي
+            reportType: reportTypeName,                                    // C: نوع التقرير
+            reporterId: reporterId,                                        // D: ايدي المسؤول
+            targetId: targetId,                                            // E: ايدي العسكري
+            details: details || "-",                                       // F: التفاصيل
+            penalty: (cat === 'accountability') ? penaltyInput : ""        // G: المحاسبة المستحقة
         };
 
         const formData = new FormData();
