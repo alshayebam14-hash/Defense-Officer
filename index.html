@@ -196,6 +196,9 @@
 </div>
 
 <script>
+    // رابط قاعدة البيانات (Google Apps Script)
+    const DATABASE_URL = "https://script.google.com/macros/s/AKfycbz5-t_HoTfFLTtocuN7rnYDIRtcJKpqi_clwmxFjIbT2s7PTGWzvY7rice7loIJdZPl-A/exec";
+
     // روابط Webhook مجهزة بترتيب القنوات من الصور
     const WEBHOOKS = {
         violations: {
@@ -284,32 +287,34 @@
 
         let webhookUrl = '';
         let messageText = '';
+        let reportTypeName = '';
 
         if (cat === 'violations') {
-            const type = violationType.value;
-            webhookUrl = WEBHOOKS.violations[type];
+            reportTypeName = violationType.value;
+            webhookUrl = WEBHOOKS.violations[reportTypeName];
 
             messageText = `📝 **التقرير جديد تم رفعه!**\n` +
                 `ايدي المسؤول: ${reporterId}\n` +
                 `ايدي العسكري: ${targetId}`;
 
-            if (type === 'تقارير-مخالفات-يدوية' || details) {
+            if (reportTypeName === 'تقارير-مخالفات-يدوية' || details) {
                 messageText += `\n📄 **تفاصيل التقرير:**\n${details}`;
             }
 
         } else if (cat === 'discipline') {
-            const type = disciplineType.value;
-            webhookUrl = WEBHOOKS.discipline[type];
+            reportTypeName = disciplineType.value;
+            webhookUrl = WEBHOOKS.discipline[reportTypeName];
 
             messageText = `🌟 **تقرير انضباط جديد تم رفعه!**\n` +
                 `ايدي المسؤول: ${reporterId}\n` +
                 `ايدي العسكري: ${targetId}`;
 
-            if (type === 'تقارير-انضباط-يدوية' || details) {
+            if (reportTypeName === 'تقارير-انضباط-يدوية' || details) {
                 messageText += `\n📄 **تفاصيل التقرير:**\n${details}`;
             }
 
         } else if (cat === 'accountability') {
+            reportTypeName = 'طلب محاسبة';
             webhookUrl = WEBHOOKS.accountability;
 
             messageText = `⚖️ **طلب محاسبة جديد!**\n` +
@@ -331,14 +336,35 @@
             messageText += `\n🎥 **رابط الفيديو:** ${videoUrl}`;
         }
 
+        // إعداد البيانات المرسلة لقاعدة البيانات
+        const dbData = {
+            mainCategory: cat,
+            reportType: reportTypeName,
+            reporterId: reporterId,
+            targetId: targetId,
+            details: details,
+            penalty: penalty,
+            videoUrl: videoUrl,
+            timestamp: new Date().toLocaleString('ar-SA')
+        };
+
         const formData = new FormData();
         formData.append('payload_json', JSON.stringify({ content: messageText }));
         if (fileInput) formData.append('file', fileInput);
 
         try {
+            // إرسال البيانات لقاعدة البيانات عبر Google Apps Script
+            fetch(DATABASE_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dbData)
+            }).catch(err => console.error("Database Error:", err));
+
+            // إرسال البيانات إلى الـ Webhook الخاص بديسكورد
             const response = await fetch(webhookUrl, { method: 'POST', body: formData });
             if (response.ok) {
-                statusMsg.innerText = '✅ تم رفع التقرير بنجاح!';
+                statusMsg.innerText = '✅ تم رفع التقرير وحفظه بنجاح!';
                 statusMsg.className = 'status success';
                 document.getElementById('reportForm').reset();
                 updateFormVisibility();
