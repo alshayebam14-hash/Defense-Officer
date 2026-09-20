@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام رفع التقارير</title>
+    <title>نظام رفع التقارير والشكاوي</title>
     <style>
         * {
             box-sizing: border-box;
@@ -114,7 +114,7 @@
 <body>
 
 <div class="card">
-    <h1>نظام رفع التقارير</h1>
+    <h1>نظام رفع التقارير والشكاوي</h1>
     
     <form id="reportForm">
         <!-- التصنيف الرئيسي -->
@@ -124,6 +124,7 @@
                 <option value="violations">تقارير المخالفات</option>
                 <option value="discipline">تقارير الانضباط اليومي</option>
                 <option value="accountability">طلبات المحاسبة</option>
+                <option value="complaints">تقارير الشكاوي</option>
             </select>
         </div>
 
@@ -157,24 +158,40 @@
             </select>
         </div>
 
-        <!-- الحقول الأساسية -->
+        <!-- قائمة تقارير الشكاوي -->
+        <div class="form-group hidden" id="complaintTypeGroup">
+            <label>نوع التقرير:</label>
+            <select id="complaintType">
+                <option value="استلام الشكاوي">استلام الشكاوي</option>
+                <option value="اعتماد الشكاوي">اعتماد الشكاوي</option>
+            </select>
+        </div>
+
+        <!-- ايدي المسؤول -->
         <div class="form-group">
             <label>ايدي المسؤول:</label>
             <input type="text" id="reporterId" placeholder="مثال: 773" required>
         </div>
 
-        <div class="form-group" id="targetUserGroup">
-            <label id="targetUserLabel">ايدي العسكري:</label>
-            <input type="text" id="targetId" placeholder="مثال: 773" required>
+        <!-- ايدي المشتكي (خاص بالشكاوي فقط) -->
+        <div class="form-group hidden" id="complainantGroup">
+            <label>ايدي المشتكي:</label>
+            <input type="text" id="complainantId" placeholder="مثال: 105">
         </div>
 
-        <!-- حقل المحاسبة المستحقة -->
+        <!-- ايدي العسكري / المخالف -->
+        <div class="form-group" id="targetUserGroup">
+            <label id="targetUserLabel">ايدي العسكري:</label>
+            <input type="text" id="targetId" placeholder="مثال: 773">
+        </div>
+
+        <!-- المحاسبة المستحقة -->
         <div class="form-group hidden" id="accountabilityGroup">
             <label>المحاسبة المستحقة:</label>
             <input type="text" id="penalty" placeholder="اكتب المحاسبة المستحقة هنا...">
         </div>
 
-        <!-- حقل التفاصيل -->
+        <!-- التفاصيل / تفاصيل الشكوى -->
         <div class="form-group" id="detailsGroup">
             <label id="detailsLabel">تفاصيل الملاحظة:</label>
             <textarea id="details" placeholder="اكتب التفاصيل هنا..."></textarea>
@@ -196,7 +213,7 @@
 </div>
 
 <script>
-    const DATABASE_URL = "https://script.google.com/macros/s/AKfycbxPQ6Gcu79_nRRUzKqVfWTK5p-v4r5hOfLIJiKmh7FkKTxHivbg23rr6-vHr8BohHErSQ/exec";
+    const DATABASE_URL = "https://script.google.com/macros/s/AKfycbwq7INkwZ0lX3QasUJHoLTyQF6_-i-h6utqVf5mYwueurireKxuQTEoMApMm7w6ol3mtA/exec";
 
     const WEBHOOKS = {
         violations: {
@@ -219,24 +236,38 @@
             "تقارير-افضل-عسكري-قيادي-بالميدان": "https://discord.com/api/webhooks/1550236721331970078/7kVGSsXoCgH-ib4xzcNB8LFRgiTT2iIUkH8USHs5hrOZTJMdHjhm-8Kb_yD_G0zTtx7b",
             "تقارير-انضباط-يدوية": "https://discord.com/api/webhooks/1550236761257414697/TruEP3xBRk8zkfYJzBm4JRveFoMIPGXTHmT4Dad6pPlazptpGYQVD2H444-UQ-xr30sn"
         },
-        accountability: "https://discord.com/api/webhooks/1550236815271661568/TtHkqDE2Td_e_GwD-lJlTz5TCFdPAby7okXx-BzZuB2tIk5bqfnH1nYDDlH_LWQmHIsP"
+        accountability: "https://discord.com/api/webhooks/1550236815271661568/TtHkqDE2Td_e_GwD-lJlTz5TCFdPAby7okXx-BzZuB2tIk5bqfnH1nYDDlH_LWQmHIsP",
+        complaints: {
+            "استلام الشكاوي": "https://discord.com/api/webhooks/1551328658113830913/7YoJT64DT-C_rOW792r0MrpmAgttAdoxbXs8PiXqD2eYI4fpxy1yNIa9CRnuaqgzPMFg",
+            "اعتماد الشكاوي": "https://discord.com/api/webhooks/1551329137036234842/Q276rRkvgbLz_i7FzyTU5Qi-bJgFI-pesiRqATpn8W90E1Y9vJLSXNnYJACbLx9y-F5l"
+        }
     };
 
     const mainCategory = document.getElementById('mainCategory');
     const violationTypeGroup = document.getElementById('violationTypeGroup');
     const disciplineTypeGroup = document.getElementById('disciplineTypeGroup');
+    const complaintTypeGroup = document.getElementById('complaintTypeGroup');
     const accountabilityGroup = document.getElementById('accountabilityGroup');
     const detailsGroup = document.getElementById('detailsGroup');
+    const complainantGroup = document.getElementById('complainantGroup');
+    const targetUserGroup = document.getElementById('targetUserGroup');
     const violationType = document.getElementById('violationType');
     const disciplineType = document.getElementById('disciplineType');
+    const complaintType = document.getElementById('complaintType');
     const targetUserLabel = document.getElementById('targetUserLabel');
+    const detailsLabel = document.getElementById('detailsLabel');
 
     function updateFormVisibility() {
         const cat = mainCategory.value;
 
         violationTypeGroup.classList.add('hidden');
         disciplineTypeGroup.classList.add('hidden');
+        complaintTypeGroup.classList.add('hidden');
         accountabilityGroup.classList.add('hidden');
+        complainantGroup.classList.add('hidden');
+        targetUserGroup.classList.remove('hidden');
+        detailsGroup.classList.remove('hidden');
+        detailsLabel.innerText = "تفاصيل الملاحظة:";
 
         if (cat === 'violations') {
             violationTypeGroup.classList.remove('hidden');
@@ -248,8 +279,25 @@
             checkManualField(disciplineType.value);
         } else if (cat === 'accountability') {
             accountabilityGroup.classList.remove('hidden');
-            detailsGroup.classList.remove('hidden');
             targetUserLabel.innerText = 'ايدي المخالف:';
+        } else if (cat === 'complaints') {
+            complaintTypeGroup.classList.remove('hidden');
+            detailsLabel.innerText = "تفاصيل الشكوى:";
+            updateComplaintFields();
+        }
+    }
+
+    function updateComplaintFields() {
+        const type = complaintType.value;
+        complainantGroup.classList.remove('hidden');
+
+        if (type === 'استلام الشكاوي') {
+            targetUserGroup.classList.add('hidden');
+            accountabilityGroup.classList.add('hidden');
+        } else if (type === 'اعتماد الشكاوي') {
+            targetUserGroup.classList.remove('hidden');
+            targetUserLabel.innerText = 'ايدي المخالف:';
+            accountabilityGroup.classList.remove('hidden');
         }
     }
 
@@ -264,6 +312,7 @@
     mainCategory.addEventListener('change', updateFormVisibility);
     violationType.addEventListener('change', (e) => checkManualField(e.target.value));
     disciplineType.addEventListener('change', (e) => checkManualField(e.target.value));
+    complaintType.addEventListener('change', updateComplaintFields);
 
     updateFormVisibility();
 
@@ -277,6 +326,7 @@
 
         const cat = mainCategory.value;
         const reporterId = document.getElementById('reporterId').value.trim();
+        const complainantId = document.getElementById('complainantId').value.trim();
         const targetId = document.getElementById('targetId').value.trim();
         const details = document.getElementById('details').value.trim();
         const penaltyInput = document.getElementById('penalty').value.trim();
@@ -292,61 +342,54 @@
             categoryArabicName = 'تقارير المخالفات';
             reportTypeName = violationType.value;
             webhookUrl = WEBHOOKS.violations[reportTypeName];
-
-            messageText = `📝 **التقرير جديد تم رفعه!**\n` +
-                `ايدي المسؤول: ${reporterId}\n` +
-                `ايدي العسكري: ${targetId}`;
-
-            if (reportTypeName === 'تقارير-مخالفات-يدوية' || details) {
-                messageText += `\n📄 **تفاصيل التقرير:**\n${details}`;
-            }
+            messageText = `📝 **التقرير جديد تم رفعه!**\nايدي المسؤول: ${reporterId}\nايدي العسكري: ${targetId}`;
+            if (reportTypeName === 'تقارير-مخالفات-يدوية' || details) messageText += `\n📄 **تفاصيل التقرير:**\n${details}`;
 
         } else if (cat === 'discipline') {
             categoryArabicName = 'تقارير الانضباط اليومي';
             reportTypeName = disciplineType.value;
             webhookUrl = WEBHOOKS.discipline[reportTypeName];
-
-            messageText = `🌟 **تقرير انضباط جديد تم رفعه!**\n` +
-                `ايدي المسؤول: ${reporterId}\n` +
-                `ايدي العسكري: ${targetId}`;
-
-            if (reportTypeName === 'تقارير-انضباط-يدوية' || details) {
-                messageText += `\n📄 **تفاصيل التقرير:**\n${details}`;
-            }
+            messageText = `🌟 **تقرير انضباط جديد تم رفعه!**\nايدي المسؤول: ${reporterId}\nايدي العسكري: ${targetId}`;
+            if (reportTypeName === 'تقارير-انضباط-يدوية' || details) messageText += `\n📄 **تفاصيل التقرير:**\n${details}`;
 
         } else if (cat === 'accountability') {
             categoryArabicName = 'طلبات المحاسبة';
             reportTypeName = 'طلب محاسبة';
             webhookUrl = WEBHOOKS.accountability;
+            messageText = `⚖️ **طلب محاسبة جديد!**\nايدي المسؤول: ${reporterId}\nايدي المخالف: ${targetId}\nتفاصيل المخالفة:\n${details}\nالمحاسبة المستحقة: ${penaltyInput}`;
 
-            messageText = `⚖️ **طلب محاسبة جديد!**\n` +
-                `ايدي المسؤول: ${reporterId}\n` +
-                `ايدي المخالف: ${targetId}\n` +
-                `تفاصيل المخالفة:\n${details}\n` +
-                `المحاسبة المستحقة: ${penaltyInput}`;
+        } else if (cat === 'complaints') {
+            categoryArabicName = 'تقارير الشكاوي';
+            reportTypeName = complaintType.value;
+            webhookUrl = WEBHOOKS.complaints[reportTypeName];
+
+            if (reportTypeName === 'استلام الشكاوي') {
+                messageText = `📥 **استلام شكوى جديدة!**\nايدي المسؤول: ${reporterId}\nايدي المشتكي: ${complainantId}\nتفاصيل الشكوى:\n${details}`;
+            } else {
+                messageText = `✅ **اعتماد شكوى!**\nايدي المسؤول: ${reporterId}\nايدي المشتكي: ${complainantId}\nايدي المخالف: ${targetId}\nتفاصيل الشكوى:\n${details}\nالمحاسبة المستحقة: ${penaltyInput}`;
+            }
         }
 
         if (!webhookUrl) {
-            statusMsg.innerText = '❌ لم يتم وضع رابط Webhook لهذا القسم بعد.';
+            statusMsg.innerText = '❌ لم يتم وضع رابط Webhook لهذا القسم.';
             statusMsg.className = 'status error';
             submitBtn.disabled = false;
             submitBtn.innerText = 'رفع التقرير';
             return;
         }
 
-        if (videoUrl) {
-            messageText += `\n🎥 **رابط الفيديو:** ${videoUrl}`;
-        }
+        if (videoUrl) messageText += `\n🎥 **رابط الفيديو:** ${videoUrl}`;
 
-        // إعداد كائن البيانات بالترتيب المطابق لعمود الشيت
+        // إعداد كائن البيانات بالترتيب المطابق لعمود الشيت الجديد
         const dbData = {
-            timestamp: new Date().toLocaleDateString('en-CA'),              // A: التاريخ
-            mainCategory: categoryArabicName,                               // B: التصنيف الرئيسي
-            reportType: reportTypeName,                                    // C: نوع التقرير
-            reporterId: reporterId,                                        // D: ايدي المسؤول
-            targetId: targetId,                                            // E: ايدي العسكري
-            details: details || "-",                                       // F: التفاصيل
-            penalty: (cat === 'accountability') ? penaltyInput : ""        // G: المحاسبة المستحقة
+            timestamp: new Date().toLocaleDateString('en-CA'),
+            mainCategory: categoryArabicName,
+            reportType: reportTypeName,
+            reporterId: reporterId,
+            complainantId: complainantId || "",
+            targetId: targetId || "",
+            details: details || "-",
+            penalty: (cat === 'accountability' || reportTypeName === 'اعتماد الشكاوي') ? penaltyInput : ""
         };
 
         const formData = new FormData();
@@ -354,7 +397,6 @@
         if (fileInput) formData.append('file', fileInput);
 
         try {
-            // إرسال البيانات لقاعدة البيانات عبر Google Apps Script
             fetch(DATABASE_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -362,15 +404,14 @@
                 body: JSON.stringify(dbData)
             }).catch(err => console.error("Database Error:", err));
 
-            // إرسال البيانات إلى الـ Webhook الخاص بديسكورد
             const response = await fetch(webhookUrl, { method: 'POST', body: formData });
             if (response.ok) {
-                statusMsg.innerText = '✅ تم رفع التقرير وحفظه بنجاح!';
+                statusMsg.innerText = '✅ تم رفع التقرير/الشكوى وحفظها بنجاح!';
                 statusMsg.className = 'status success';
                 document.getElementById('reportForm').reset();
                 updateFormVisibility();
             } else {
-                throw new Error('حدث خطأ أثناء الإرسال، تأكد من صحة الـ Webhook.');
+                throw new Error('حدث خطأ أثناء الإرسال إلى Discord.');
             }
         } catch (err) {
             statusMsg.innerText = `❌ ${err.message}`;
